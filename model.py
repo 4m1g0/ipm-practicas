@@ -30,3 +30,22 @@ class Model():
             if fecha.month == fechaCalendario.month and fecha.year == fechaCalendario.year:
                 days.append(fecha.day)
         return days
+    
+    def getEventDesc(self, fechaCalendario):
+        if not self.connected:
+            return []
+        
+        map_fun = '''function(doc) {
+            if (doc.type == "Event") {
+                emit(doc.date, [doc.description, doc.tags]);
+            }
+        }'''
+        result = self.db.temporary_query(map_fun)
+        desc = []
+        for row in result:
+            fecha = datetime.strptime(row['key'], "%Y-%m-%d")
+            if fecha.month == fechaCalendario.month and fecha.year == fechaCalendario.year and fecha.day == fechaCalendario.day:
+                desc.append(row["value"])
+        return desc
+        
+        

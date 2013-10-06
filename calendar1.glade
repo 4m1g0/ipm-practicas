@@ -106,16 +106,42 @@ Oscar Blanco Novoa &lt;o.blanco@udc.es&gt;</property>
           </packing>
         </child>
         <child>
-          <object class="GtkCalendar" id="calendar1">
+          <object class="GtkBox" id="box2">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="year">2012</property>
-            <property name="month">9</property>
-            <property name="day">2</property>
-            <signal name="month-changed" handler="on_monthChanged" swapped="no"/>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkCalendar" id="calendar1">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="year">2012</property>
+                <property name="month">9</property>
+                <property name="day">2</property>
+                <signal name="month-changed" handler="on_monthChanged" swapped="no"/>
+                <signal name="day-selected" handler="on_daySelected" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkTreeView" id="treeview1">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <child internal-child="selection">
+                  <object class="GtkTreeSelection" id="treeview-selection1"/>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
           </object>
           <packing>
-            <property name="expand">False</property>
+            <property name="expand">True</property>
             <property name="fill">True</property>
             <property name="position">1</property>
           </packing>

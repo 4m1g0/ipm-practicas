@@ -19,9 +19,15 @@ class Controller():
         self.view1.showAcercade()
         
     def on_monthChanged(self,w):
-        self.view1.clearAll()
+        self.view1.clearMarks()
         self.fecha = self.view1.getDate()
         GetEvents(self.fecha, self.model, self.view1).start()
+    
+    def on_daySelected(self,w):
+        self.view1.clearDescription()
+        self.fecha = self.view1.getDate()
+        if self.fecha.day in self.view1.getMarkedDays():
+            GetDescription(self.fecha, self.model, self.view1).start()
 
 class GetEvents(threading.Thread):
     def __init__(self, fecha, model, view):
@@ -36,3 +42,19 @@ class GetEvents(threading.Thread):
     
     def informar(self):
         self.view.markDays(self.markedDays, self.fecha)
+        
+class GetDescription(threading.Thread):
+    def __init__(self, fecha, model, view):
+        super(GetDescription, self).__init__()
+        self.fecha = fecha
+        self.model = model
+        self.view = view
+        self.text = []
+    
+    def run(self):
+        self.text = self.model.getEventDesc(self.fecha)
+        GObject.idle_add(self.informar)
+    
+    def informar(self):
+        self.view.showDescription(self.text, self.fecha)
+
