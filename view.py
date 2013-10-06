@@ -1,10 +1,22 @@
 from gi.repository import Gtk
 from datetime import datetime
 from gi.repository import Pango
+import locale
+import gettext
+import os
+
+locale.setlocale(locale.LC_ALL,'')
+LOCALE_DIR = os.path.join(os.path.dirname(__file__), "locale")
+locale.bindtextdomain('calendario', LOCALE_DIR)
+gettext.bindtextdomain('calendario', LOCALE_DIR)
+gettext.textdomain('calendario')
+_ = gettext.gettext
+N_ = gettext.ngettext
 
 class View():
     def __init__(self, controller):
         self.builder = Gtk.Builder()
+        self.builder.set_translation_domain('calendario')
         self.builder.add_from_file("calendar1.glade")
         self.builder.connect_signals(controller)
         w = self.builder.get_object("window1")
@@ -13,7 +25,7 @@ class View():
         self.about = self.builder.get_object("aboutdialog1")
         self.liststore = Gtk.ListStore(str, str)
         self.treeview.set_model(model=self.liststore)
-        columns = ['Evento', 'Tags']
+        columns = [_('Evento'), _('Tags')]
         for i in range(len(columns)):
             cell = Gtk.CellRendererText()
             if i == 0:

@@ -12,7 +12,7 @@ class Model():
             self.connected = True
         except:
             self.connected = False
-            print("Error: No se pudo conectar con la base de datos")
+            print(_("Error: No se pudo conectar con la base de datos"))
     
     def getEventDays(self, fechaCalendario):
         if not self.connected:
@@ -34,7 +34,6 @@ class Model():
     def getEventDesc(self, fechaCalendario):
         if not self.connected:
             return []
-        
         map_fun = '''function(doc) {
             if (doc.type == "Event") {
                 emit(doc.date, [doc.description, doc.tags]);
