@@ -23,6 +23,8 @@ class View():
         self.calendar = self.builder.get_object("calendar1")
         self.treeview = self.builder.get_object("treeview1")
         self.about = self.builder.get_object("aboutdialog1")
+        self.login = self.builder.get_object("dialog1")
+        self.loginEntry = self.builder.get_object("entry1")
         self.liststore = Gtk.ListStore(str, str)
         self.treeview.set_model(model=self.liststore)
         columns = [_('Evento'), _('Tags')]
@@ -39,6 +41,11 @@ class View():
     def showAcercade(self):
         self.about.run()
         self.about.hide()
+    
+    def showLogin(self):
+        r = self.login.run()
+        self.login.hide()
+        return r
 
     def markDays(self, days, fecha):
         year, month, day = self.calendar.get_date()
@@ -76,4 +83,6 @@ class View():
                 row[1] = tags
                 self.liststore.append(row)
     
+    def getLoginText(self):
+        return self.loginEntry.get_text()
     

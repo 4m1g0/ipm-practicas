@@ -14,24 +14,25 @@ class Model():
             self.connected = False
             print("Error: No se pudo conectar con la base de datos")
     
-    def getEventDays(self, fechaCalendario):
+    def getEventDays(self, fechaCalendario, subjects):
         if not self.connected:
             return []
         
         map_fun = '''function(doc) {
             if (doc.type == "Event") {
-                emit(doc.id, doc.date);
+                emit(doc.id, {date: doc.date, tags: doc.tags});
             }
         }'''
         result = self.db.temporary_query(map_fun)
         days = []
         for row in result:
-            fecha = datetime.strptime(row['value'], "%Y-%m-%d")
+            fecha = datetime.strptime(row['value']['date'], "%Y-%m-%d")
             if fecha.month == fechaCalendario.month and fecha.year == fechaCalendario.year:
-                days.append(fecha.day)
+                if subjects == [] or row['value']['tags'][0] in subjects:
+                    days.append(fecha.day)
         return days
     
-    def getEventDesc(self, fechaCalendario):
+    def getEventDesc(self, fechaCalendario, subjects):
         if not self.connected:
             return []
         map_fun = '''function(doc) {
@@ -44,7 +45,26 @@ class Model():
         for row in result:
             fecha = datetime.strptime(row['key'], "%Y-%m-%d")
             if fecha.month == fechaCalendario.month and fecha.year == fechaCalendario.year and fecha.day == fechaCalendario.day:
-                desc.append(row["value"])
+                if subjects == [] or row['value'][1][0] in subjects:
+                    desc.append(row['value'])
         return desc
+        
+   
+    def getSubjects(self, user):
+        if not self.connected:
+            return []
+        
+        map_fun = '''function(doc) {
+              if (doc.subtype=="student") {
+                emit(doc.description, doc.subjects);
+              }
+        }'''
+        
+        result = self.db.temporary_query(map_fun)
+        for row in result:
+            if row["key"] == user:
+                return row["value"]
+        
+        return []
         
         
