@@ -12,7 +12,7 @@ class Model():
             self.connected = True
         except:
             self.connected = False
-            print(_("Error: No se pudo conectar con la base de datos"))
+            print("Error: No se pudo conectar con la base de datos")
     
     def getEventDays(self, fechaCalendario):
         if not self.connected:
