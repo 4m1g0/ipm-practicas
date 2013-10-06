@@ -25,6 +25,7 @@ class View():
         self.about = self.builder.get_object("aboutdialog1")
         self.login = self.builder.get_object("dialog1")
         self.loginEntry = self.builder.get_object("entry1")
+        self.comboText = self.builder.get_object("comboboxtext1")
         self.liststore = Gtk.ListStore(str, str)
         self.treeview.set_model(model=self.liststore)
         columns = [_('Evento'), _('Tags')]
@@ -85,4 +86,8 @@ class View():
     
     def getLoginText(self):
         return self.loginEntry.get_text()
+        
+    def setTeacherSubjects(self, subjects):
+        for i in subjects:
+            self.comboText.append_text(i)
     

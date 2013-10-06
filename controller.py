@@ -37,7 +37,7 @@ class Controller():
             if self.user == "":
                 self.subjects = []
             else:
-                GetSubjects(self.user, self, self.model).start()
+                GetSubjects(self.user, self, self.model, self.view1).start()
     
     def updateSubjects(self, subjects):
         self.subjects = subjects
@@ -77,14 +77,23 @@ class GetDescription(threading.Thread):
         
         
 class GetSubjects(threading.Thread):
-    def __init__(self, user, controller, model):
+    def __init__(self, user, controller, model, view):
         super(GetSubjects, self).__init__()
         self.user = user
         self.model = model
+        self.subjects = []
         self.controller = controller
-    
+        self.view = view
+        
     def run(self):
-        subjects = self.model.getSubjects(self.user)
-        GObject.idle_add(self.controller.updateSubjects, subjects)
+        (subjects, subtype) = self.model.getSubjects(self.user)
+        if subtype == 1:
+            self.subjects = subjects
+            GObject.idle_add(self.informar)
+        else:
+            GObject.idle_add(self.controller.updateSubjects, self.subjects)
+    
+    def informar(self):
+        self.view.setTeacherSubjects(self.subjects)
         
         

@@ -54,17 +54,19 @@ class Model():
         if not self.connected:
             return []
         
-        map_fun = '''function(doc) {
-              if (doc.subtype=="student") {
-                emit(doc.description, doc.subjects);
-              }
-        }'''
+        map_fun = '''map_fun = function(doc) {
+            if (doc.type == "User") {
+		        emit(doc.description, {Subtype: doc.subtype, Subjects: doc.subjects});
+	            }
+            }'''
         
         result = self.db.temporary_query(map_fun)
         for row in result:
             if row["key"] == user:
-                return row["value"]
-        
-        return []
+                if row["value"]["Subtype"] == "student":
+                    return (row["value"]["Subjects"],0) # 0 = student
+                else:
+                    return (row["value"]["Subjects"],1) # 1 = teacher
+        return ([],-1) # -1 no encontrado
         
         
