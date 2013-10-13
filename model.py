@@ -88,6 +88,25 @@ class Model():
                 desc.append(row['value'])
             
         return desc
+    
+    
+    def getStudents(self, subjects):
+        if not self.connected:
+            return ([])
+        
+        map_fun = '''map_fun = function(doc) {
+            if (doc.subtype == "student") {
+		        emit(doc.subjects, doc.description);
+	            }
+            }'''
+        
+        result = self.db.temporary_query(map_fun)
+        students = []
+        for row in result:
+            if list(set(row['key']) & set(subjects)) != []: # interseccion de ambas listas de asignaturas
+                students.append(row['value'])
+            
+        return students
             
             
             

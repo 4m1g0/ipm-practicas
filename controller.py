@@ -41,6 +41,7 @@ class Controller():
     
     def on_callLogin(self,w):
         if self.view1.showLogin() == 1:
+            self.view1.hideUserMenu() # ocultamos hasta que recibamos info valida
             self.view1.cleanSubjects()
             user = self.view1.getLoginText()
             self.subjects = []
@@ -52,6 +53,13 @@ class Controller():
             subject = self.view1.getTeacherSubject()
             self.updateSubjects(subject)
             self.view1.setStatus( _("Viendo eventos de ") + subject, 0)
+    
+    def on_callStudentDialog(self,w):
+        if self.view1.showStudentsDialog() == 1:
+            student = self.view1.getTeacherStudent()
+            self.subjects = []
+            self.view1.setStatus(_("Obteniendo asignaturas para el usuario ") + student + "...", 1)
+            GetSubjects(student, self, self.model, self.view1).start()
             
     def on_logout(self,w):
         self.view1.hideUserMenu()
@@ -133,11 +141,30 @@ class GetSubjects(threading.Thread):
     def informar(self):
         self.view.setTeacherSubjects(self.subjects)
         self.view.showSubjectsMenu()
+        GetStudents(self.subjects, self.model, self.view).start()
     
     def error(self):
         self.view.clearStatus()
         self.view.showError()
         self.view.hideUserMenu()
         
-
+class GetStudents(threading.Thread):
+    def __init__(self, subjects, model, view):
+        super(GetStudents, self).__init__()
+        self.subjects = subjects
+        self.model = model
+        self.view = view
+        self.students = []
+    
+    def run(self):
+        self.students = self.model.getStudents(self.subjects)
+        GObject.idle_add(self.informar)
+    
+    def informar(self):
+        self.view.setTeacherStudents(self.students)
+        self.view.showStudentsMenu()
+        
+        
+        
+        
     

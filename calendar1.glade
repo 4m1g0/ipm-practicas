@@ -315,6 +315,11 @@ Oscar Blanco Novoa &lt;o.blanco@udc.es&gt;</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-missing-image</property>
   </object>
+  <object class="GtkImage" id="image2">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-missing-image</property>
+  </object>
   <object class="GtkImage" id="image3">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -431,6 +436,16 @@ Oscar Blanco Novoa &lt;o.blanco@udc.es&gt;</property>
                         <property name="image">image3</property>
                         <property name="use_stock">False</property>
                         <signal name="activate" handler="on_callSubjectDialog" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="imagemenuitem4">
+                        <property name="label" translatable="yes">Ver como alumno</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">image2</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_callStudentDialog" swapped="no"/>
                       </object>
                     </child>
                     <child>

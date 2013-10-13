@@ -33,6 +33,9 @@ class View():
         self.userMenu = self.builder.get_object("menuitem2")
         self.viewSubjectMenu = self.builder.get_object("imagemenuitem2")
         self.errorDialog = self.builder.get_object("messagedialog1")
+        self.StudentsDialog = self.builder.get_object("dialog3")
+        self.comboBoxStudents = self.builder.get_object("combobox2")
+        self.viewAsStudentMenu = self.builder.get_object("imagemenuitem4")
         
         # TreeView configuration
         self.liststoreDesc = Gtk.ListStore(str, str)
@@ -53,6 +56,13 @@ class View():
         self.comboBoxSubjects.add_attribute(cell, "text", 0)
         self.comboBoxSubjects.set_model(model=self.liststoreSubjects)
         
+        # ComboBoxStudents configuration
+        self.liststoreStudents = Gtk.ListStore(str)
+        cell = Gtk.CellRendererText()
+        self.comboBoxStudents.pack_start(cell, False)
+        self.comboBoxStudents.add_attribute(cell, "text", 0)
+        self.comboBoxStudents.set_model(model=self.liststoreStudents)
+        
         # Statusbar configuration
         self.status = []
         self.status.append(self.statusbar.get_context_id("status"))
@@ -61,9 +71,11 @@ class View():
         
         self.markedDays = []
         self.subjects = []
+        self.students = []
         w.show_all()
         self.userMenu.hide()
         self.viewSubjectMenu.hide()
+        self.viewAsStudentMenu.hide()
     
     def showAcercade(self):
         self.about.run()
@@ -77,6 +89,11 @@ class View():
     def showSubjectsDialog(self):
         r = self.subjectsDialog.run()
         self.subjectsDialog.hide()
+        return r
+        
+    def showStudentsDialog(self):
+        r = self.StudentsDialog.run()
+        self.StudentsDialog.hide()
         return r
     
     def showError(self):
@@ -126,8 +143,12 @@ class View():
         self.userMenu.show()
         self.viewSubjectMenu.show()
     
+    def showStudentsMenu(self):
+        self.viewAsStudentMenu.show()
+    
     def hideUserMenu(self):
         self.viewSubjectMenu.hide()
+        self.viewAsStudentMenu.hide()
         self.userMenu.hide()
         
     def setTeacherSubjects(self, subjects):
@@ -144,6 +165,21 @@ class View():
         self.liststoreSubjects.clear()
         self.subjects = []
         self.comboBoxSubjects.set_active(0)
+        
+    def setTeacherStudents(self, students):
+        self.liststoreStudents.clear()
+        self.students = students
+        for student in students:
+            self.liststoreStudents.append([student])
+        self.comboBoxStudents.set_active(0)
+    
+    def getTeacherStudent(self):
+        return self.students[self.comboBoxStudents.get_active()]
+    
+    def cleanStudents(self):
+        self.liststoreStudents.clear()
+        self.students = []
+        self.comboBoxStudents.set_active(0)
     
     def setStatus(self, text, subtype):
         self.statusbar.push(self.status[subtype], text)
