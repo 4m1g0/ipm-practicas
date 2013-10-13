@@ -27,7 +27,11 @@ class View():
         self.about = self.builder.get_object("aboutdialog1")
         self.login = self.builder.get_object("dialog1")
         self.loginEntry = self.builder.get_object("entry1")
+        self.comboBoxSubjects = self.builder.get_object("combobox1")
+        self.subjectsDialog = self.builder.get_object("dialog2")
         self.statusbar = self.builder.get_object("statusbar1")
+        self.userMenu = self.builder.get_object("menuitem2")
+        self.viewSubjectMenu = self.builder.get_object("imagemenuitem2")
         self.errorDialog = self.builder.get_object("messagedialog1")
         
         # TreeView configuration
@@ -42,6 +46,13 @@ class View():
             col.set_min_width(160)
             self.treeview.append_column(col)
         
+        # ComboBoxSubjects configuration
+        self.liststoreSubjects = Gtk.ListStore(str)
+        cell = Gtk.CellRendererText()
+        self.comboBoxSubjects.pack_start(cell, False)
+        self.comboBoxSubjects.add_attribute(cell, "text", 0)
+        self.comboBoxSubjects.set_model(model=self.liststoreSubjects)
+        
         # Statusbar configuration
         self.status = []
         self.status.append(self.statusbar.get_context_id("status"))
@@ -51,6 +62,8 @@ class View():
         self.markedDays = []
         self.subjects = []
         w.show_all()
+        self.userMenu.hide()
+        self.viewSubjectMenu.hide()
     
     def showAcercade(self):
         self.about.run()
@@ -59,6 +72,11 @@ class View():
     def showLogin(self):
         r = self.login.run()
         self.login.hide()
+        return r
+
+    def showSubjectsDialog(self):
+        r = self.subjectsDialog.run()
+        self.subjectsDialog.hide()
         return r
     
     def showError(self):
@@ -103,6 +121,29 @@ class View():
     
     def getLoginText(self):
         return self.loginEntry.get_text()
+        
+    def showSubjectsMenu(self):
+        self.userMenu.show()
+        self.viewSubjectMenu.show()
+    
+    def hideUserMenu(self):
+        self.viewSubjectMenu.hide()
+        self.userMenu.hide()
+        
+    def setTeacherSubjects(self, subjects):
+        self.liststoreSubjects.clear()
+        self.subjects = subjects
+        for subject in subjects:
+            self.liststoreSubjects.append([subject])
+        self.comboBoxSubjects.set_active(0)
+        
+    def getTeacherSubject(self):
+        return self.subjects[self.comboBoxSubjects.get_active()]
+    
+    def cleanSubjects(self):
+        self.liststoreSubjects.clear()
+        self.subjects = []
+        self.comboBoxSubjects.set_active(0)
     
     def setStatus(self, text, subtype):
         self.statusbar.push(self.status[subtype], text)

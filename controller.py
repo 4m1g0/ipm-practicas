@@ -38,9 +38,23 @@ class Controller():
     
     def on_callLogin(self,w):
         if self.view1.showLogin() == 1:
+            self.user = self.view1.cleanSubjects()
             self.user = self.view1.getLoginText()
+            self.subjects = []
             self.view1.setStatus(_("Obteniendo asignaturas para el usuario ") + self.user + "...", 1)
             GetSubjects(self.user, self, self.model, self.view1).start()
+    
+    def on_callSubjectDialog(self,w):
+        if self.view1.showSubjectsDialog() == 1:
+            subject = self.view1.getTeacherSubject()
+            self.updateSubjects(subject)
+            self.view1.setStatus( _("Viendo eventos de ") + subject, 0)
+            
+    def on_logout(self,w):
+        self.view1.hideUserMenu()
+        self.updateSubjects([])
+        self.view1.clearStatus()
+        
     
     def updateSubjects(self, subjects):
         self.subjects = subjects
@@ -94,14 +108,22 @@ class GetSubjects(threading.Thread):
         (subjects, subtype) = self.model.getSubjects(self.user)
         self.subjects = subjects
         GObject.idle_add(self.controller.updateSubjects, self.subjects)
+        if subtype == 1:# teacher
+            GObject.idle_add(self.informar)
+        elif subtype == -1:
+            GObject.idle_add(self.controller.updateSubjects, self.subjects)
+            GObject.idle_add(self.error)
+                  
         if (subtype != -1):
             GObject.idle_add(self.view.setStatus, _("Viendo eventos de ") + self.user, 0)
-        else:
-            GObject.idle_add(self.error)
+    
+    def informar(self):
+        self.view.setTeacherSubjects(self.subjects)
+        self.view.showSubjectsMenu()
     
     def error(self):
         self.view.clearStatus()
         self.view.showError()
-        
+        self.view.hideUserMenu()
         
         
