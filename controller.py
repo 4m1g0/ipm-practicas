@@ -1,5 +1,7 @@
 import threading
+import time
 from gi.repository import GObject
+from gi.repository import Notify
 from datetime import datetime
 
 from view import *
@@ -13,9 +15,10 @@ class Controller():
         self.model = Model(self)
         self.view1 = View(self)
         self.fecha = self.view1.getDate()
-        self.user = ""
         self.subjects = []
+        Notify.init(_("Calendario"))
         GetEvents(self.fecha, self.subjects, self.model, self.view1).start()
+        self.showNotifications() # timer
     
     def on_close(self,w,e=None):
         Gtk.main_quit()
@@ -38,11 +41,11 @@ class Controller():
     
     def on_callLogin(self,w):
         if self.view1.showLogin() == 1:
-            self.user = self.view1.cleanSubjects()
-            self.user = self.view1.getLoginText()
+            self.view1.cleanSubjects()
+            user = self.view1.getLoginText()
             self.subjects = []
-            self.view1.setStatus(_("Obteniendo asignaturas para el usuario ") + self.user + "...", 1)
-            GetSubjects(self.user, self, self.model, self.view1).start()
+            self.view1.setStatus(_("Obteniendo asignaturas para el usuario ") + user + "...", 1)
+            GetSubjects(user, self, self.model, self.view1).start()
     
     def on_callSubjectDialog(self,w):
         if self.view1.showSubjectsDialog() == 1:
@@ -55,11 +58,21 @@ class Controller():
         self.updateSubjects([])
         self.view1.clearStatus()
         
-    
     def updateSubjects(self, subjects):
         self.subjects = subjects
         self.on_monthChanged(None)
         self.on_daySelected(None)
+    
+    def showNotifications(self):
+        now = datetime.now()
+        events = self.model.getCloseEvents(now)
+        if events != []:
+            eventStr = _("Falta poco para los siguientes eventos:\n")
+            for event in events:
+                eventStr += event + "\n"
+            notification = Notify.Notification.new(_("Calendario"), eventStr, 'dialog-information')
+            notification.show()
+        
 
 class GetEvents(threading.Thread):
     def __init__(self, fecha, subjects, model, view):
@@ -126,4 +139,5 @@ class GetSubjects(threading.Thread):
         self.view.showError()
         self.view.hideUserMenu()
         
-        
+
+    

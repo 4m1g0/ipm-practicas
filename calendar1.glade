@@ -425,7 +425,7 @@ Oscar Blanco Novoa &lt;o.blanco@udc.es&gt;</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkImageMenuItem" id="imagemenuitem2">
-                        <property name="label">Consulta por asignatura</property>
+                        <property name="label" translatable="yes">Consulta por asignatura</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="image">image3</property>
@@ -435,7 +435,7 @@ Oscar Blanco Novoa &lt;o.blanco@udc.es&gt;</property>
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="imagemenuitem3">
-                        <property name="label">Cerrar sesión</property>
+                        <property name="label" translatable="yes">Cerrar sesión</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_stock">False</property>

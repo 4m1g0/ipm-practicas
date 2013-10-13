@@ -1,5 +1,5 @@
 import pycouchdb
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class Model():
     def __init__(self, controller):
@@ -68,5 +68,26 @@ class Model():
                 else:
                     return (row["value"]["Subjects"],1) # 1 = teacher
         return ([],-1) # -1 no encontrado
+
+
+    def getCloseEvents(self, now):
+        if not self.connected:
+            return ([])
         
+        map_fun = '''map_fun = function(doc) {
+            if (doc.type == "Event") {
+		        emit(doc.date, doc.description);
+	            }
+            }'''
         
+        result = self.db.temporary_query(map_fun)
+        desc = []
+        for row in result:
+            fecha = datetime.strptime(row['key'], "%Y-%m-%d")
+            if abs(fecha - now) < timedelta(days = 30):
+                desc.append(row['value'])
+            
+        return desc
+            
+            
+            
