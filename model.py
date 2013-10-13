@@ -52,7 +52,7 @@ class Model():
    
     def getSubjects(self, user):
         if not self.connected:
-            return []
+            return ([],-1)
         
         map_fun = '''map_fun = function(doc) {
             if (doc.type == "User") {

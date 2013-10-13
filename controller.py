@@ -5,6 +5,9 @@ from datetime import datetime
 from view import *
 from model import *
 
+_ = gettext.gettext
+N_ = gettext.ngettext
+
 class Controller():
     def __init__(self):
         self.model = Model(self)
@@ -23,21 +26,21 @@ class Controller():
     def on_monthChanged(self,w):
         self.view1.clearMarks()
         self.fecha = self.view1.getDate()
+        self.view1.setStatus(_("Obteniendo dias marcados para el mes actual..."), 1)
         GetEvents(self.fecha, self.subjects, self.model, self.view1).start()
     
     def on_daySelected(self,w):
         self.view1.clearDescription()
         self.fecha = self.view1.getDate()
         if self.fecha.day in self.view1.getMarkedDays():
+            self.view1.setStatus(_("Obteniendo eventos para el dia seleccionado..."), 1)
             GetDescription(self.fecha, self.subjects, self.model, self.view1).start()
     
     def on_callLogin(self,w):
         if self.view1.showLogin() == 1:
             self.user = self.view1.getLoginText()
-            if self.user == "":
-                self.subjects = []
-            else:
-                GetSubjects(self.user, self, self.model, self.view1).start()
+            self.view1.setStatus(_("Obteniendo asignaturas para el usuario ") + self.user + "...", 1)
+            GetSubjects(self.user, self, self.model, self.view1).start()
     
     def updateSubjects(self, subjects):
         self.subjects = subjects
@@ -58,6 +61,7 @@ class GetEvents(threading.Thread):
     
     def informar(self):
         self.view.markDays(self.markedDays, self.fecha)
+        self.view.statusPop()
         
 class GetDescription(threading.Thread):
     def __init__(self, fecha, subjects, model, view):
@@ -74,6 +78,7 @@ class GetDescription(threading.Thread):
     
     def informar(self):
         self.view.showDescription(self.text, self.fecha)
+        self.view.statusPop()
         
         
 class GetSubjects(threading.Thread):
@@ -87,13 +92,16 @@ class GetSubjects(threading.Thread):
         
     def run(self):
         (subjects, subtype) = self.model.getSubjects(self.user)
-        if subtype == 1:
-            self.subjects = subjects
-            GObject.idle_add(self.informar)
+        self.subjects = subjects
+        GObject.idle_add(self.controller.updateSubjects, self.subjects)
+        if (subtype != -1):
+            GObject.idle_add(self.view.setStatus, _("Viendo eventos de ") + self.user, 0)
         else:
-            GObject.idle_add(self.controller.updateSubjects, self.subjects)
+            GObject.idle_add(self.error)
     
-    def informar(self):
-        self.view.setTeacherSubjects(self.subjects)
+    def error(self):
+        self.view.clearStatus()
+        self.view.showError()
+        
         
         
