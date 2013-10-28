@@ -1,5 +1,6 @@
 package es.udc.ipm33.calendario;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -23,6 +24,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.roomorama.caldroid.CaldroidFragment;
@@ -40,6 +42,10 @@ public class MainActivity extends FragmentActivity {
 	private List<EventVO> dailyEvents = new LinkedList<EventVO>();
 	private ArrayAdapter<EventVO> eventsListViewAdapter;
 	private ProgressDialog progressDialog;
+	private List<String> subjects;
+	MenuItem menuViewBySubject;
+    MenuItem menuLogout;
+    MenuItem menuLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,39 +82,88 @@ public class MainActivity extends FragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        menuViewBySubject = menu.findItem(R.id.menu_view_by_subject);
+        menuLogout = menu.findItem(R.id.menu_logout);
+        menuLogin = menu.findItem(R.id.menu_login);
+        
+        menuViewBySubject.setVisible(false); // hide until login
+        menuLogout.setVisible(false); // hide until login
+
         return true;
     }
     
     public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.menu_login) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string.menu_login);
-
-			final EditText input = new EditText(this);
-			input.setInputType(InputType.TYPE_CLASS_TEXT);
-			builder.setView(input);
-
-			builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-			        String user = input.getText().toString();
-			        updateByUser(user);
-			    }
-			});
-			builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-			        dialog.cancel();
-			    }
-			});
-
-			builder.show();
+		switch (item.getItemId()) {
+			case R.id.menu_login:
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.menu_login);
+	
+				final EditText input = new EditText(this);
+				input.setInputType(InputType.TYPE_CLASS_TEXT);
+				builder.setView(input);
+	
+				builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				        String user = input.getText().toString();
+				        updateByUser(user);
+				    }
+				});
+				builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				        dialog.cancel();
+				    }
+				});
+	
+				builder.show();
+				break;
+				
+			case R.id.menu_view_by_subject:
+				AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+				builder2.setTitle(R.string.select_subject);
+	
+				final Spinner spinner = new Spinner(this);
+				builder2.setView(spinner);
+				
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, subjects);
+				spinner.setAdapter(adapter);
+				
+				builder2.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				        List<String> subject = new ArrayList<String>(1);
+				        subject.add(spinner.getSelectedItem().toString());
+				        updateBySubject(subject);
+				    }
+				});
+				builder2.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				        dialog.cancel();
+				    }
+				});
+	
+				builder2.show();
+				break;
+			
+			case R.id.menu_logout:
+				updateBySubject(null);
+				menuViewBySubject.setVisible(false); // hide until login
+		        menuLogout.setVisible(false); // hide until login
+		        menuLogin.setVisible(true); // show login again
+		        break;
 		}
 			
     	return false;
     }
     
     private void updateByUser(final String user) {
+    	progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setTitle(getString(R.string.loading));
+        progressDialog.setMessage(getString(R.string.loading_user));
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
     	EktorpAsyncTask getUsersTask = new EktorpAsyncTask() {
     		
     		private UserVO result = null;
@@ -123,17 +178,23 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             protected void onSuccess() {
+            	progressDialog.dismiss(); // dismiss first because here another dialog will be shown
             	if (result != null) {
+            		subjects = result.getSubjects();
             		updateBySubject(result.getSubjects());
+                    menuLogout.setVisible(true);
+                    menuLogin.setVisible(false);
+                    if (result.getSubtype().equals("teacher"))
+                    	menuViewBySubject.setVisible(true);
             	} else {
-            		Toast.makeText(getApplicationContext(), "El usuario introducido no es válido", Toast.LENGTH_LONG).show();
+            		Toast.makeText(getApplicationContext(), R.string.invalid_username, Toast.LENGTH_LONG).show();
             	}
             }
 
             @Override
             protected void onDbAccessException(DbAccessException dbAccessException) {
                 Log.e("Calendar/MainActivity", "DbAccessException in background", dbAccessException);
-                Toast.makeText(getApplicationContext(), "Error establishing a server connection!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
             }
         };
         getUsersTask.execute();

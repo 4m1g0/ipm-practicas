@@ -8,5 +8,11 @@
     <string name="menu_login">Login</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-
+    <string name="menu_view_by_subject">View by subject</string>
+    <string name="invalid_username">Invalid username</string>
+    <string name="connection_error">Error establishing a server connection!</string>
+    <string name="loading_user">Loading user data</string>
+	<string name="menu_logout">Logout</string>
+	<string name="select_subject">Select one subject</string>
+	
 </resources>
