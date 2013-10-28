@@ -50,16 +50,21 @@ public class MainActivity extends FragmentActivity {
         ListView eventListView = (ListView) findViewById(R.id.eventList);
         eventsListViewAdapter = new EventsArrayAdapter(this, dailyEvents);
         eventListView.setAdapter(eventsListViewAdapter);
-                
+        
+        if (savedInstanceState != null) {
+    	  caldroidFragment.restoreStatesFromKey(savedInstanceState, "CALDROID_SAVED_STATE");
+    	} 
+        else {
         // Configure calendar view        
-        caldroidFragment = new CaldroidFragment();
-        Bundle args = new Bundle();
-        Calendar cal = Calendar.getInstance();
-        args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
-        args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
-        args.putInt(CaldroidFragment.START_DAY_OF_WEEK, CaldroidFragment.MONDAY);
-        caldroidFragment.setArguments(args);
-
+	        caldroidFragment = new CaldroidFragment();
+	        Bundle args = new Bundle();
+	        Calendar cal = Calendar.getInstance();
+	        args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
+	        args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
+	        args.putInt(CaldroidFragment.START_DAY_OF_WEEK, CaldroidFragment.MONDAY);
+	        caldroidFragment.setArguments(args);
+    	}
+        
         FragmentTransaction t = getSupportFragmentManager().beginTransaction();
         t.replace(R.id.calendar1, caldroidFragment);
         t.commit();
@@ -118,8 +123,10 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             protected void onSuccess() {
-            	if (result != null && result.getDescription() == user) {
+            	if (result != null) {
             		updateBySubject(result.getSubjects());
+            	} else {
+            		Toast.makeText(getApplicationContext(), "El usuario introducido no es válido", Toast.LENGTH_LONG).show();
             	}
             }
 
@@ -154,13 +161,16 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             protected void onSuccess() {
-            	caldroidFragment.setTextColorForDates(null);
+            	caldroidFragment.setBackgroundResourceForDates(null);
             	for (EventVO event:events) {
-    				if (someIn(subjects, event.getTags())) {
+    				if (subjects == null || subjects.contains(event.getTags().get(0))) {
     					caldroidFragment.setBackgroundResourceForDate(R.color.blue, event.getDate());
     				}
             	}
-            	
+            	// refresh view and clear list after change marked days
+            	caldroidFragment.refreshView();
+            	dailyEvents.clear();
+    	    	eventsListViewAdapter.notifyDataSetChanged();
             	progressDialog.dismiss();
             	
             	final CaldroidListener listener = new CaldroidListener() {
@@ -169,11 +179,18 @@ public class MainActivity extends FragmentActivity {
             	    public void onSelectDate(Date date, View view) {
             	    	dailyEvents.clear();
                     	for (EventVO event:events) {
-                    		if (event.getDate().equals(date)) {
+                    		if (event.getDate().equals(date) && (subjects == null || subjects.contains(event.getTags().get(0)))) {
                     			dailyEvents.add(event);
                     		}
                     	}
                     	eventsListViewAdapter.notifyDataSetChanged();
+            	    }
+            	    
+            	    @Override
+            	    public void onChangeMonth(int month, int year) {
+            	    	// on change month clean event descriptions 'cause no longer valid for new month
+            	    	dailyEvents.clear();
+            	    	eventsListViewAdapter.notifyDataSetChanged();
             	    }
             	};
             	
@@ -189,14 +206,12 @@ public class MainActivity extends FragmentActivity {
         getEventsTask.execute();
     }
     
-    private boolean someIn(List<String> a, List<String> b) {
-    	if (a == null)
-    		return true; // devuelve siempre cierto si el filtro es null
-    	
-    	for (String element:a) {
-    		if (b.contains(element))
-    			return true;
-    	}
-    	return false;
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (caldroidFragment != null) {
+            caldroidFragment.saveStatesToKey(outState, "CALDROID_SAVED_STATE");
+        }
     }
 }
