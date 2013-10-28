@@ -1,6 +1,5 @@
 package es.udc.ipm33.calendario.model;
 
-import android.annotation.SuppressLint;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,6 +7,8 @@ import java.util.List;
 
 import org.ektorp.support.Entity;
 import org.ektorp.support.TypeDiscriminator;
+
+import android.annotation.SuppressLint;
 
 /**
  * Encapsulates a document of type "User" in the CouchDB database
@@ -89,15 +90,7 @@ public class EventVO extends Entity {
     
     @Override
     public String toString() {
-        String string = super.getId() + "@" + super.getRevision() + " | " + this.type + " | " + this.creator + " | " + this.date + " | " + 
-            this.description + "\t| [";
-        for (String tag:tags) {
-            string += tag + ";";
-        }
-        string += "]";
+        String string =  this.description + "\n" + this.creator + "\n" + formatter.format(this.date) + "\n"  + this.tags.toString();
         return string;            
     }
-
-    
-
 }

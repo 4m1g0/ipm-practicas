@@ -21,7 +21,7 @@ public class EventsArrayAdapter extends ArrayAdapter<EventVO> {
     }
 
     @Override
-    public View getView(int position, View contentView, ViewGroup parent) {
+    public View getView(final int position, View contentView, ViewGroup parent) {
         View rowView = contentView;
         EventRowViewCache eventRowViewCache;
 
@@ -39,6 +39,8 @@ public class EventsArrayAdapter extends ArrayAdapter<EventVO> {
 
         eventRowViewCache.desc.setText(events.get(position).getDescription());
         eventRowViewCache.tags.setText(events.get(position).getTags().toString());
+        
+
 
         return rowView;
     }

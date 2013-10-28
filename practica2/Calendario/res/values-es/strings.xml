@@ -14,5 +14,10 @@
     <string name="loading_user">Cargando datos de usuario</string>
     <string name="menu_logout">Cerrar sesión</string>
     <string name="select_subject">Selecciona una asignatura</string>
+    <string name="close_event">Evento próximo</string>
+    <string name="title">Título</string>
+    <string name="creator">Creador</string>
+    <string name="tags">Tags</string>
+    <string name="date">Fecha</string>
 
 </resources>

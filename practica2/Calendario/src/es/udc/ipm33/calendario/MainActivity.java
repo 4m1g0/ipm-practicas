@@ -11,16 +11,23 @@ import org.ektorp.DbAccessException;
 import org.ektorp.android.util.EktorpAsyncTask;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -46,6 +53,7 @@ public class MainActivity extends FragmentActivity {
 	MenuItem menuViewBySubject;
     MenuItem menuLogout;
     MenuItem menuLogin;
+    public final static String EXTRA_MESSAGE = "es.udc.ipm33.calendario.MESSAGE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +64,15 @@ public class MainActivity extends FragmentActivity {
         ListView eventListView = (ListView) findViewById(R.id.eventList);
         eventsListViewAdapter = new EventsArrayAdapter(this, dailyEvents);
         eventListView.setAdapter(eventsListViewAdapter);
+
+        eventListView.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+				Intent i = new Intent(MainActivity.this, DescriptionActivity.class);
+				i.putExtra(EXTRA_MESSAGE, dailyEvents.get(position).toString());
+				
+				startActivity(i);
+            }
+          });
         
         if (savedInstanceState != null) {
     	  caldroidFragment.restoreStatesFromKey(savedInstanceState, "CALDROID_SAVED_STATE");
@@ -193,6 +210,7 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             protected void onDbAccessException(DbAccessException dbAccessException) {
+            	progressDialog.dismiss();
                 Log.e("Calendar/MainActivity", "DbAccessException in background", dbAccessException);
                 Toast.makeText(getApplicationContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
             }
@@ -225,6 +243,8 @@ public class MainActivity extends FragmentActivity {
             	caldroidFragment.setBackgroundResourceForDates(null);
             	for (EventVO event:events) {
     				if (subjects == null || subjects.contains(event.getTags().get(0))) {
+    					if (Math.abs(event.getDate().getTime() - new Date().getTime()) < 86400000*3)
+    						showNotification(event);
     					caldroidFragment.setBackgroundResourceForDate(R.color.blue, event.getDate());
     				}
             	}
@@ -260,11 +280,32 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             protected void onDbAccessException(DbAccessException dbAccessException) {
+            	progressDialog.dismiss();
                 Log.e("Calendar/MainActivity", "DbAccessException in background", dbAccessException);
-                Toast.makeText(getApplicationContext(), "Error establishing a server connection!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
             }
         };
         getEventsTask.execute();
+    }
+    
+    private void showNotification(EventVO event) {
+		Intent intent = new Intent(this, DescriptionActivity.class);
+		intent.putExtra(EXTRA_MESSAGE, event.toString());
+		intent.setAction(Long.toString(System.currentTimeMillis()));
+		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		
+		Notification n  = new  NotificationCompat.Builder(this)
+		        .setContentTitle(getString(R.string.close_event))
+		        .setContentText(event.getDescription() + " " + event.getTags().toString())
+		        .setSmallIcon(R.drawable.ic_launcher)
+		        .setContentIntent(pIntent)
+		        .setAutoCancel(true).build();
+		    
+		  
+		NotificationManager notificationManager = 
+		  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		
+		notificationManager.notify(event.hashCode(), n); 
     }
     
     @Override
