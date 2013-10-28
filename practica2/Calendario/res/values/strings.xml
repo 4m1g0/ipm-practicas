@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Calendario</string>
+    <string name="app_name">Calendar</string>
     <string name="action_settings">Settings</string>
-    <string name="loading">Cargando</string>
-    <string name="loading_events">Cargando eventos del calendario</string>
+    <string name="loading">Loading</string>
+    <string name="loading_events">Loading calendar events</string>
+    <string name="menu_login">Login</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
 </resources>
