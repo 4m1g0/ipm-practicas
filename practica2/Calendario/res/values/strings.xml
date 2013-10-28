@@ -4,6 +4,6 @@
     <string name="app_name">Calendario</string>
     <string name="action_settings">Settings</string>
     <string name="loading">Cargando</string>
-	<string name="loading_events">Cargando eventos del calendario</string>
+    <string name="loading_events">Cargando eventos del calendario</string>
 
 </resources>

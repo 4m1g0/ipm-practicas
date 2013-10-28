@@ -1,6 +1,8 @@
 package es.udc.ipm33.calendario;
 
 import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.ektorp.CouchDbConnector;
@@ -13,9 +15,13 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.roomorama.caldroid.CaldroidFragment;
+import com.roomorama.caldroid.CaldroidListener;
 
 import es.udc.ipm33.calendario.model.CouchDBAndroidHelper;
 import es.udc.ipm33.calendario.model.EventDAO;
@@ -25,6 +31,8 @@ import es.udc.ipm33.calendario.model.EventVO;
 public class MainActivity extends FragmentActivity {
 	private CaldroidFragment caldroidFragment;
 	private List<EventVO> events = null;
+	private List<EventVO> dailyEvents = new LinkedList<EventVO>();
+	private ArrayAdapter<EventVO> eventsListViewAdapter;
 	private ProgressDialog progressDialog;
 
     @Override
@@ -32,6 +40,11 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        // Configure bottom list view
+        ListView eventListView = (ListView) findViewById(R.id.eventList);
+        eventsListViewAdapter = new EventsArrayAdapter(this, dailyEvents);
+        eventListView.setAdapter(eventsListViewAdapter);
+                
         // Configure calendar view        
         caldroidFragment = new CaldroidFragment();
         Bundle args = new Bundle();
@@ -68,6 +81,22 @@ public class MainActivity extends FragmentActivity {
             		caldroidFragment.setBackgroundResourceForDate(R.color.blue, event.getDate());
             	}
             	progressDialog.dismiss();
+            	
+            	final CaldroidListener listener = new CaldroidListener() {
+
+            	    @Override
+            	    public void onSelectDate(Date date, View view) {
+            	    	dailyEvents.clear();
+                    	for (EventVO event:events) {
+                    		if (event.getDate().equals(date)) {
+                    			dailyEvents.add(event);
+                    		}
+                    	}
+                    	eventsListViewAdapter.notifyDataSetChanged();
+            	    }
+            	};
+            	
+            	caldroidFragment.setCaldroidListener(listener);
             }
 
             @Override
