@@ -40,4 +40,13 @@ class CouchDBDAO():
             
         return self.__view_to_list(self._db.query(f, key=user))
 
+    def searchEvent(self, event):
+        f = '''
+            function (doc) {
+                if (doc.type =='User') {
+                    emit(doc.description ,[doc.subtype, doc.subjects]);
+                }
+            }'''
+            
+        return self.__view_to_list(self._db.query(f, key=user))
 

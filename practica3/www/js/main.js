@@ -12,6 +12,7 @@ Calendar = function (month, year) {
     var events = [];
     var user = [];
     var subjects = [];
+    var validData;
     bindAllListeners();
     changeMonth(year, month);
     
@@ -22,7 +23,11 @@ Calendar = function (month, year) {
         showLoading();
         
         var xhr = new XMLHttpRequest();
+        var token = Math.random();
+        validData = token;
         xhr.onreadystatechange=function() {
+            if (token != validData) // si la peticion ya ha expirado salimos
+                return;
             if (xhr.readyState==4) {
                 switch (xhr.status) {
                     case 200: // OK!
@@ -100,7 +105,7 @@ Calendar = function (month, year) {
         clearDescription();
         var day = parseInt(this.firstElementChild.innerHTML);
         for (i=0; i < events.length; i++) {
-            if (parseInt(events[i][0]) == day) {
+            if (parseInt(events[i][0]) == day && subjects.indexOf(events[i][2][0]) != -1) {
                 var span = document.createElement("li");
                 span.appendChild(document.createTextNode(events[i][1] + " - " + events[i][2]));
                 document.querySelector("#event-description").appendChild(span);
