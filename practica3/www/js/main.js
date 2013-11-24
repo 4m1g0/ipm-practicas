@@ -16,6 +16,7 @@ Calendar = function (month, year) {
     function changeMonth(year, month) {
         prepareView(year, month);
         removeAllMarks(); // borramos las descripciones anteriores y esperamos por los datos
+        clearDescription();
         showLoading();
         
         var xhr = new XMLHttpRequest();
@@ -85,8 +86,16 @@ Calendar = function (month, year) {
         changeMonth(year, month);
     }
     
-    function onClickDay(day) {
-        // TODO:
+    function onClickDay() {
+        clearDescription();
+        var day = parseInt(this.firstElementChild.innerHTML);
+        for (i=0; i < events.length; i++) {
+            if (parseInt(events[i][0]) == day) {
+                var span = document.createElement("li");
+                span.appendChild(document.createTextNode(events[i][1] + " - " + events[i][2]));
+                document.querySelector("#event-description").appendChild(span);
+            }
+        }
     }
     
     function prepareView(year, month) {
@@ -134,5 +143,12 @@ Calendar = function (month, year) {
 	
 	function hideLoading () {
 	    document.querySelector("img.loading").classList.add("hidden");
+	}
+	
+	function clearDescription() {
+	    var desc = document.querySelector("#event-description")
+	    while(desc.hasChildNodes()){
+            desc.removeChild(desc.lastChild);
+        }
 	}
 }

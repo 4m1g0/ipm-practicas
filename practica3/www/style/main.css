@@ -29,6 +29,19 @@ menu ul li {
     margin: 0.5em 1em;
 }
 
+#event-description {
+    border-top: 1px solid #ccc;
+    margin-top: 2em;
+}
+
+#event-description  li {
+    -webkit-border-radius: 0.3em; 
+    -moz-border-radius: 0.3em; 
+    border-radius: 0.3em;
+    background-color: #9cd;
+    padding: 0.4em;
+}
+
 div.loading {
     height:46px;
 }
@@ -160,6 +173,10 @@ nav *{
 
 .nav-button:hover {
     cursor:pointer;
+}
+
+#event-description span {
+    display: block;
 }
 
 
