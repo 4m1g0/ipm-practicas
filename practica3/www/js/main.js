@@ -11,6 +11,7 @@
 Calendar = function (month, year) {
     var events = [];
     var user = [];
+    var subjects = [];
     bindAllListeners();
     changeMonth(year, month);
     
@@ -50,6 +51,7 @@ Calendar = function (month, year) {
         document.querySelector("#dialog form").addEventListener('submit', onLogin, false);
         document.querySelector("#cancel").addEventListener('click', onCancelLogin, false);
         document.querySelector("#logout").addEventListener('click', onLogout, false);
+        document.querySelector("#view_by_subject").addEventListener('change', onSubjectChange, false);
     }
     
     function removeAllMarks() {
@@ -65,7 +67,7 @@ Calendar = function (month, year) {
         //[[doc.subtype, doc.subjects]]
         events = data;
         for (i=0; i < data.length; i++) {
-            if (user.length == 0 || user[0][1].indexOf(data[i][2][0]) != -1) {
+            if (user.length == 0 || subjects.indexOf(data[i][2][0]) != -1) {
                 document.querySelector("#day" + data[i][0] + " .day-content").innerHTML += data[i][2][0] + " ";
                 document.querySelector("#day" + data[i][0]).classList.add("marked");
             }
@@ -123,11 +125,29 @@ Calendar = function (month, year) {
                 hideLoading();
                 if (response.length == 1) {
                     user = response;
+                    subjects = user[0][1];
                     changeMonth(year, month);
                     document.querySelector("#login").classList.add("hidden");
                     document.querySelector("#logout").classList.remove("hidden");
+                    if (user[0][0] == "teacher") {
+                        var select = document.querySelector("#view_by_subject");
+                        var option;
+                        while(select.hasChildNodes()) { // primero limpiamos las opciones anteriores
+                            select.removeChild(select.lastChild);
+                        }
+                        option = document.createElement("option");
+                        option.setAttribute("value", "todo");
+                        option.innerHTML = "todo";
+                        select.appendChild(option);
+                        for (i=0; i < subjects.length; i++) {
+                            option = document.createElement("option");
+                            option.setAttribute("value", subjects[i]);
+                            option.innerHTML = subjects[i];
+                            select.appendChild(option);
+                        }
+                        select.classList.remove("hidden");
+                    }
                 } else {
-                    
                     alert("Error: El usuario no ha sido encontrado en la base de datos.");
                 }
             }
@@ -145,6 +165,17 @@ Calendar = function (month, year) {
         changeMonth(year, month);
         document.querySelector("#login").classList.remove("hidden");
         document.querySelector("#logout").classList.add("hidden");
+        document.querySelector("#view_by_subject").classList.add("hidden");
+    }
+    
+    function onSubjectChange() {
+        var subject = document.querySelector("#view_by_subject").value;
+        if (subject == "todo") {
+            subjects = user[0][1];
+        } else {
+            subjects = [subject];
+        }
+        changeMonth(year, month);
     }
     
     function prepareView(year, month) {
