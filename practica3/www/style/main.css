@@ -108,6 +108,10 @@ li.day span {
     float: right;
 }
 
+[aria-hidden="true"] { /* Algunos navegadores no comprueban esto cuando cambia dinamicamente */
+    display: none;
+}
+
 .hidden {
     display: none;
 }

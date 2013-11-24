@@ -109,12 +109,14 @@ Calendar = function (month, year) {
     }
     
     function onShowLogin() {
+        document.querySelector("#dialog").setAttribute("aria-hidden",false);
         document.querySelector("#dialog").classList.remove("hidden");
     }
     
     function onLogin(e) {
         e.preventDefault();
         showLoading();
+        document.querySelector("#dialog").setAttribute("aria-hidden",true);
         document.querySelector("#dialog").classList.add("hidden");
         var xhr = new XMLHttpRequest();
         var name = document.querySelector("#usuario").value;
@@ -127,7 +129,9 @@ Calendar = function (month, year) {
                     user = response;
                     subjects = user[0][1];
                     changeMonth(year, month);
+                    document.querySelector("#login").setAttribute("aria-hidden",true);
                     document.querySelector("#login").classList.add("hidden");
+                    document.querySelector("#logout").setAttribute("aria-hidden",false);
                     document.querySelector("#logout").classList.remove("hidden");
                     if (user[0][0] == "teacher") {
                         var select = document.querySelector("#view_by_subject");
@@ -145,6 +149,7 @@ Calendar = function (month, year) {
                             option.innerHTML = subjects[i];
                             select.appendChild(option);
                         }
+                        select.setAttribute("aria-hidden",false);
                         select.classList.remove("hidden");
                     }
                 } else {
@@ -156,6 +161,7 @@ Calendar = function (month, year) {
     }
     
     function onCancelLogin(e) {
+        document.querySelector("#dialog").setAttribute("aria-hidden",true);
         document.querySelector("#dialog").classList.add("hidden");
         e.preventDefault();
     }
@@ -163,8 +169,11 @@ Calendar = function (month, year) {
     function onLogout() {
         user = [];
         changeMonth(year, month);
+        document.querySelector("#login").setAttribute("aria-hidden",false);
         document.querySelector("#login").classList.remove("hidden");
+        document.querySelector("#logout").setAttribute("aria-hidden",true);
         document.querySelector("#logout").classList.add("hidden");
+        document.querySelector("#view_by_subject").setAttribute("aria-hidden",true);
         document.querySelector("#view_by_subject").classList.add("hidden");
     }
     
@@ -182,19 +191,27 @@ Calendar = function (month, year) {
         // asignar número de dias del mes
         var days = daysInMonth(month, year);
         for (i=29; i<=31; i++) {
-            if (days >= i)
+            if (days >= i) {
+                document.querySelector("#day" + i).setAttribute("aria-hidden",false);
                 document.querySelector("#day" + i).classList.remove("hidden");
-            else
+            }
+            else {
+                document.querySelector("#day" + i).setAttribute("aria-hidden",true);
                 document.querySelector("#day" + i).classList.add("hidden");
+            }
         }
         
         // colocamos el primer dia del mes bajo el dia de la semana correcto
         var firstDay = firstDayOfMonth(month, year);
         for (i=1; i<=6; i++) {
-            if (i < firstDay)
+            if (i < firstDay) {
+                document.querySelector("#space" + i).setAttribute("aria-hidden",false);
                 document.querySelector("#space" + i).classList.remove("hidden");
-            else
+            }
+            else {
+                document.querySelector("#space" + i).setAttribute("aria-hidden",true);
                 document.querySelector("#space" + i).classList.add("hidden");
+            }
         }
         
         document.querySelector("#month").innerHTML = getMonthName(month) + " " + year;
@@ -219,10 +236,12 @@ Calendar = function (month, year) {
 	
 	function showLoading () {
 	    document.querySelector("img.loading").classList.remove("hidden");
+	    document.querySelector("img.loading").setAttribute("aria-hidden",false);
 	}
 	
 	function hideLoading () {
 	    document.querySelector("img.loading").classList.add("hidden");
+	    document.querySelector("img.loading").setAttribute("aria-hidden",true);
 	}
 	
 	function clearDescription() {
