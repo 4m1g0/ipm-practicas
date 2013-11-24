@@ -47,10 +47,14 @@ Calendar = function (month, year) {
     
     function bindAllListeners() {
         document.querySelector("#atras").addEventListener('click', onPrevMonth, false);
+        document.querySelector("#atras").addEventListener('keydown', function(e){if(e.keyCode === 13)onPrevMonth();}, false);
         document.querySelector("#adelante").addEventListener('click', onNextMonth, false);
+        document.querySelector("#adelante").addEventListener('keydown', function(e){if(e.keyCode === 13)onNextMonth();}, false);
         var days = document.querySelectorAll(".day");
-        for (i=0; i < days.length; i++)
+        for (i=0; i < days.length; i++) {
            days[i].addEventListener('click', onClickDay, false);
+           days[i].addEventListener('keydown', function(e){if(e.keyCode === 13)onClickDay(e);}, false);
+        }
         
         document.querySelector("#login").addEventListener('click', onShowLogin, false);
         document.querySelector("#dialog form").addEventListener('submit', onLogin, false);
@@ -102,9 +106,12 @@ Calendar = function (month, year) {
         changeMonth(year, month);
     }
     
-    function onClickDay() {
+    function onClickDay(e) {
         clearDescription();
-        var day = parseInt(this.firstElementChild.innerHTML);
+        var day;
+        console.log(e.target.className);
+        if (e.target.classList.contains("day")) day = parseInt(e.target.firstElementChild.innerHTML);
+        else day = parseInt(this.firstElementChild.innerHTML);
         for (i=0; i < events.length; i++) {
             if (parseInt(events[i][0]) == day && (subjects.length == 0 || subjects.indexOf(events[i][2][0]) != -1)) {
                 var span = document.createElement("li");
@@ -198,7 +205,7 @@ Calendar = function (month, year) {
         var busqueda = document.querySelector("#busqueda").value;
         var found = false;
         for (i=0; i < events.length; i++) {
-            if (events[i][1].indexOf(busqueda) != -1) {
+            if (events[i][1].indexOf(busqueda) != -1 && (subjects.length == 0 || subjects.indexOf(events[i][2][0]) != -1)) {
                 document.querySelector("#day"+events[i][0]).focus();
                 found = true;
                 break;
