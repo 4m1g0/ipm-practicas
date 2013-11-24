@@ -57,6 +57,7 @@ Calendar = function (month, year) {
         document.querySelector("#cancel").addEventListener('click', onCancelLogin, false);
         document.querySelector("#logout").addEventListener('click', onLogout, false);
         document.querySelector("#view_by_subject").addEventListener('change', onSubjectChange, false);
+        document.querySelector("#busqueda").addEventListener('change', onSearch, false);
     }
     
     function removeAllMarks() {
@@ -105,7 +106,7 @@ Calendar = function (month, year) {
         clearDescription();
         var day = parseInt(this.firstElementChild.innerHTML);
         for (i=0; i < events.length; i++) {
-            if (parseInt(events[i][0]) == day && subjects.indexOf(events[i][2][0]) != -1) {
+            if (parseInt(events[i][0]) == day && (subjects.length == 0 || subjects.indexOf(events[i][2][0]) != -1)) {
                 var span = document.createElement("li");
                 span.appendChild(document.createTextNode(events[i][1] + " - " + events[i][2]));
                 document.querySelector("#event-description").appendChild(span);
@@ -173,6 +174,7 @@ Calendar = function (month, year) {
     
     function onLogout() {
         user = [];
+        subjects = [];
         changeMonth(year, month);
         document.querySelector("#login").setAttribute("aria-hidden",false);
         document.querySelector("#login").classList.remove("hidden");
@@ -190,6 +192,20 @@ Calendar = function (month, year) {
             subjects = [subject];
         }
         changeMonth(year, month);
+    }
+    
+    function onSearch() {
+        var busqueda = document.querySelector("#busqueda").value;
+        var found = false;
+        for (i=0; i < events.length; i++) {
+            if (events[i][1].indexOf(busqueda) != -1) {
+                document.querySelector("#day"+events[i][0]).focus();
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            alert("No se ha encontrado nada de lo que buscabas");
     }
     
     function prepareView(year, month) {
