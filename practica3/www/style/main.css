@@ -173,6 +173,10 @@ nav *{
     padding: 0.6em;
 }
 
+#dialog td {
+    width: 50%;
+}
+
 .nav-button:hover {
     cursor:pointer;
 }
