@@ -4,6 +4,7 @@
 import cgi
 import couchdb
 import DAO
+import json
 
 
 def get_database_connection():
@@ -14,20 +15,20 @@ def get_database_connection():
     
 def get_user():
     form = cgi.FieldStorage()
-    if form.has_key("user"):
+    if form.has_key("user"):  
         return form["user"].value
     return ""
     
 def main():
     dao = get_database_connection()
     user = get_user()
-    if user "":
+    if user == "":
         print "[]"
-    else
-        print dao.getUser(user)
+    else:
+        print json.dumps(dao.getUser(user))
 
 try:
-    print "Content-Type: text/html\n\n"
+    print "Content-Type: application/json\n\n"
     main()
     
 except:

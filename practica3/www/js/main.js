@@ -10,6 +10,7 @@
 
 Calendar = function (month, year) {
     var events = [];
+    var user = [];
     bindAllListeners();
     changeMonth(year, month);
     
@@ -44,6 +45,11 @@ Calendar = function (month, year) {
         var days = document.querySelectorAll(".day");
         for (i=0; i < days.length; i++)
            days[i].addEventListener('click', onClickDay, false);
+        
+        document.querySelector("#login").addEventListener('click', onShowLogin, false);
+        document.querySelector("#dialog form").addEventListener('submit', onLogin, false);
+        document.querySelector("#cancel").addEventListener('click', onCancelLogin, false);
+        document.querySelector("#logout").addEventListener('click', onLogout, false);
     }
     
     function removeAllMarks() {
@@ -56,11 +62,13 @@ Calendar = function (month, year) {
     }
     
     function markDays(data) {
-        //[[day, description, [tags]]]
+        //[[doc.subtype, doc.subjects]]
         events = data;
         for (i=0; i < data.length; i++) {
-            document.querySelector("#day" + data[i][0] + " .day-content").innerHTML += data[i][2][0] + " ";
-            document.querySelector("#day" + data[i][0]).classList.add("marked");
+            if (user.length == 0 || user[0][1].indexOf(data[i][2][0]) != -1) {
+                document.querySelector("#day" + data[i][0] + " .day-content").innerHTML += data[i][2][0] + " ";
+                document.querySelector("#day" + data[i][0]).classList.add("marked");
+            }
         }
         
         hideLoading();
@@ -96,6 +104,47 @@ Calendar = function (month, year) {
                 document.querySelector("#event-description").appendChild(span);
             }
         }
+    }
+    
+    function onShowLogin() {
+        document.querySelector("#dialog").classList.remove("hidden");
+    }
+    
+    function onLogin(e) {
+        e.preventDefault();
+        showLoading();
+        document.querySelector("#dialog").classList.add("hidden");
+        var xhr = new XMLHttpRequest();
+        var name = document.querySelector("#usuario").value;
+        xhr.open('GET', '/cgi-bin/user.py?user=' + name, true);
+        xhr.onload = function (e) {
+            if (this.status == 200) {
+                var response = JSON.parse(this.response);
+                hideLoading();
+                if (response.length == 1) {
+                    user = response;
+                    changeMonth(year, month);
+                    document.querySelector("#login").classList.add("hidden");
+                    document.querySelector("#logout").classList.remove("hidden");
+                } else {
+                    
+                    alert("Error: El usuario no ha sido encontrado en la base de datos.");
+                }
+            }
+        }
+        xhr.send();
+    }
+    
+    function onCancelLogin(e) {
+        document.querySelector("#dialog").classList.add("hidden");
+        e.preventDefault();
+    }
+    
+    function onLogout() {
+        user = [];
+        changeMonth(year, month);
+        document.querySelector("#login").classList.remove("hidden");
+        document.querySelector("#logout").classList.add("hidden");
     }
     
     function prepareView(year, month) {

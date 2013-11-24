@@ -17,8 +17,8 @@
             <ul>
                 <li><input id="busqueda" type="text" placeholder="Buscar" size="15"/> <br /></li>
                 <li><a id="login" href="#">Login</a></li>
-                <li><a id="view_by_subject" href="#">Ver por asignatura</a></li>
-                <li><a id="logout" href="#">Cerrar sesión</a></li>
+                <li><a id="view_by_subject" class="hidden" href="#">Ver por asignatura</a></li>
+                <li><a id="logout" class="hidden" href="#">Cerrar sesión</a></li>
             </ul>
             <ul id="event-description">
                 
@@ -90,19 +90,18 @@
         </footer>
     </div>
     <div id="centerpoint">
-        <section id="dialog" class="calendar-form" role="dialog">
-            <form name="calendar-data">
-                <p>
-                    <label id="lblUsuario" for="usuario">Usuario:</label>
-                    <input name="usuario" id="cuatrimestre" aria-labelledby="lblUsuario">
-                </p>
-                <p>
-                    <label id="lblPass" for="pass">Curso académico:</label>
-                    <input name="pass" id="curso" aria-labelledby="lblPass" type="password">
-                </p>
-                <p>
-                    <input type="submit" value="Enviar" />
-                </p>
+        <section id="dialog" class="calendar-form hidden" role="dialog">
+            <form name="login" action="cgi-bin/user.py" method="POST">
+                <table>
+                    <tr>
+                        <td><label id="lblUsuario" for="usuario">Usuario:</label></td>
+                        <td><input name="usuario" id="usuario" aria-labelledby="lblUsuario"></td>
+                    </tr>
+                    <tr>
+                        <td><input id="submit" type="submit" value="Enviar" /></td>
+                        <td><button id="cancel" type="button">Cancelar</button> </td>
+                    </tr>
+                </table>
             </form>
             <div id="escape"><a href="#"></a></div>
         </section>

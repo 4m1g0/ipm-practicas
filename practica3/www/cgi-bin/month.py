@@ -26,9 +26,6 @@ def main():
     else:
         events = dao.getMonthEvents(year, month)
         print json.dumps(events)
-        #for row in events:
-        #    row[1] = row[1].encode('utf-8')
-        #print events
 
 try:
     print "Content-Type: application/json\n\n"

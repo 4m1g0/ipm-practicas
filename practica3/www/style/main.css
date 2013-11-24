@@ -160,15 +160,17 @@ nav *{
 }
 
 #centerpoint {
-    top: 50%;
+    position: absolute; 
     left: 50%;
-    position: absolute;
+    top: 5%;
 }
 
 #dialog {
-    display: none;
     position: relative;
-    background-color: red;
+    left: -50%;
+    background-color: #fff;
+    border: 1px solid #f00;
+    padding: 0.6em;
 }
 
 .nav-button:hover {
