@@ -23,7 +23,7 @@ class CouchDBDAO():
             }''' # comparamos 2013-11
          
          date = ""
-         if month < 10:
+         if int(month) < 10:
             date = str(year) + "-0" + str(month) + "-"
          else:
             date = str(year) + "-" + str(month) + "-"
