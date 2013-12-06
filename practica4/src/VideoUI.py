@@ -150,7 +150,10 @@ class VideoUI():
     def clicked_button(self, index, count):
         # IMPORTANT: ANY CALL TO A WEBKIT FUNCTION SHOULD BE MADE INSIDE THE
         # GOBJECT.IDLE_ADD FUNCTION. OTHERWISE, IT WILL NOT WORK!!!
-        pass
+        if index == 0:
+            gobject.idle_add(self.playPause)
+        else:
+            gobject.idle_add(self.next)
     
     def playPause(self):
         self.webview.execute_script('playPause()')
