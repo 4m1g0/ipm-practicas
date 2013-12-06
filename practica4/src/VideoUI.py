@@ -152,8 +152,10 @@ class VideoUI():
         # GOBJECT.IDLE_ADD FUNCTION. OTHERWISE, IT WILL NOT WORK!!!
         if index == 0:
             gobject.idle_add(self.playPause)
-        else:
+        elif index == 1:
             gobject.idle_add(self.next)
+        else:
+            gobject.idle_add(self.setVideo, index-2)
     
     def playPause(self):
         self.webview.execute_script('playPause()')
@@ -165,6 +167,11 @@ class VideoUI():
         self.current += 1
         if self.current == len(self.videos):
             self.current = 0
+        self.webview.execute_script('set("' + self.videos[self.current] + '")')
+        self.treeView.set_cursor(self.current)
+        
+    def setVideo(self, video):
+        self.current = video
         self.webview.execute_script('set("' + self.videos[self.current] + '")')
         self.treeView.set_cursor(self.current)
     

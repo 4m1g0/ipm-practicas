@@ -8,6 +8,7 @@ from datetime import datetime
 import pygtk
 pygtk.require('2.0')
 import gobject
+import os
 gobject.threads_init()
 
 class VideoController():
@@ -18,6 +19,14 @@ class VideoController():
     # TODO: Add new virtual bottoms by selecting new regions on the frame! 
     roi = [(0,0, 50, 50), (590, 0, 640, 50)]
     
+    n = len(os.listdir("movies"))
+    ini = 100
+    fin = 500
+    step = (fin-ini)/n
+    for i in range(n):
+        roi.append([ini, 0, ini+step, 50])
+        ini += step
+    
     self._capture_from_webcam = True
 
     self._view = VideoUI(self)
@@ -25,11 +34,14 @@ class VideoController():
 
     # Store the time where the last click was performed in each virtual button
     self.last_click = [0, 0]
+    for i in range(n):
+        self.last_click.append(0)
     
     # EXAMPLE
     # Store the number of clicks performed in each virtual button
     self.click_counter = [0, 0]
-    
+    for i in range(n):
+        self.click_counter.append(0)
   
   def start(self):
     self._capture.start()    

@@ -69,8 +69,17 @@ class VideoCapture(Thread):
      return frame_flipped
 
   def _draw_buttons(self, frame, roi, color=(255,0,255)):
+    i = 0
     for r in roi:
       cv2.rectangle(frame, (r[0],r[1]), (r[2],r[3]), color,4)
+      if i > 1:
+        cv2.putText(frame, str(i-2) , (r[0]+10,r[1]+40), cv2.FONT_HERSHEY_SIMPLEX, 1.5, 0, thickness=4)
+      else:
+        if i == 0:
+          cv2.putText(frame, "P" , (r[0]+10,r[1]+40), cv2.FONT_HERSHEY_SIMPLEX, 1.5, 0, thickness=4)
+        else: # i = 1
+          cv2.putText(frame, ">" , (r[0]+10,r[1]+40), cv2.FONT_HERSHEY_SIMPLEX, 1.5, 0, thickness=4)
+      i+=1
       
   def _extract_roi(self, frame, roi):
     images = []
