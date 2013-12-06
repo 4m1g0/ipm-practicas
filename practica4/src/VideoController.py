@@ -46,6 +46,13 @@ class VideoController():
 
   def on_stop(self,w):
       self._view.stop()
+      
+  def on_next(self,w):
+    self._view.next()
+    
+  def on_changed(self,selection):
+    (model, i) = selection.get_selected()
+    self._view.changed(model[i][0])
   
   def is_capture_enabled(self):
     return self._capture_from_webcam

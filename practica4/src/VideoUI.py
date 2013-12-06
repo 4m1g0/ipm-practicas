@@ -48,8 +48,23 @@ class VideoUI():
         stop = gtk.MenuItem("Stop")
         stop.connect("activate", controller.on_stop)
         controlsmenu.append(stop)
+        next = gtk.MenuItem("Next")
+        next.connect("activate", controller.on_next)
+        controlsmenu.append(next)
         mb.append(controlsm)
         mb.append(helpm)
+        
+        vbox = gtk.VBox()
+        self.win.add(vbox)
+        vbox.pack_start(mb, False, False, 0)
+        hbox = gtk.HBox()
+        vbox.pack_start(hbox, True, True, 0)
+        self.webcam_display = gtk.Image()
+        hbox.pack_start(self.webcam_display, False, False, 0)
+        vbox = gtk.VBox()
+        self.webview = webkit.WebView()
+        vbox.pack_start(self.webview, False, False, 0)
+        store = gtk.ListStore(int, str)
         
         if len(os.listdir("movies")) == 0:
             md = gtk.MessageDialog(self.win, 
@@ -61,18 +76,28 @@ class VideoUI():
             
         i = 0
         for movie in os.listdir("movies"):
+            store.append([i,movie])
             self.videos.append(movie)
             i+=1
+            
+        self.treeView = gtk.TreeView(store)
+        self.treeView.set_rules_hint(True)
+        sw = gtk.ScrolledWindow()
+        sw.add(self.treeView)
+        vbox.pack_start(sw, True, True, 0)
+        rendererText = gtk.CellRendererText()
+        column = gtk.TreeViewColumn("id", rendererText, text=0)
+        column.set_sort_column_id(0)
+        self.treeView.append_column(column)
+ 
+        rendererText = gtk.CellRendererText()
+        column = gtk.TreeViewColumn("Name", rendererText, text=1)
+        column.set_sort_column_id(1)    
+        self.treeView.append_column(column)
+        hbox.pack_start(vbox, True, True, 0)
         
-        vbox = gtk.VBox()
-        self.win.add(vbox)
-        vbox.pack_start(mb, False, False, 0)
-        hbox = gtk.HBox()
-        vbox.pack_start(hbox, True, True, 0)
-        self.webcam_display = gtk.Image()
-        hbox.pack_start(self.webcam_display, False, False, 0)
-        self.webview = webkit.WebView()
-        hbox.pack_start(self.webview, False, False, 0)
+        self.treeView.get_selection().connect("changed", controller.on_changed)
+        self.treeView.set_cursor(self.current)
         
 
         # other Signals
@@ -133,6 +158,16 @@ class VideoUI():
     def stop(self):
         self.webview.execute_script('stop()')
     
+    def next(self):
+        self.current += 1
+        if self.current == len(self.videos):
+            self.current = 0
+        self.webview.execute_script('set("' + self.videos[self.current] + '")')
+        self.treeView.set_cursor(self.current)
+    
+    def changed(self, i):
+        self.current = int(i)
+        self.webview.execute_script('set("' + self.videos[self.current] + '")')
 
     def start(self):
         self.win.show_all()
