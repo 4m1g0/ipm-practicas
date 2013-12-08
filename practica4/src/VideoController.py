@@ -19,6 +19,8 @@ class VideoController():
     # TODO: Add new virtual bottoms by selecting new regions on the frame! 
     roi = [(0,0, 50, 50), (590, 0, 640, 50)]
     
+    self._view = VideoUI(self)
+    
     n = len(os.listdir("movies"))
     ini = 100
     fin = 500
@@ -29,7 +31,6 @@ class VideoController():
     
     self._capture_from_webcam = True
 
-    self._view = VideoUI(self)
     self._capture = VideoCapture(self, roi)
 
     # Store the time where the last click was performed in each virtual button

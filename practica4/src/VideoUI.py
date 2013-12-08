@@ -8,6 +8,7 @@ import gtk, gobject, webkit
 class VideoUI():
 
     def __init__(self, controller):
+        self.controller = controller
         self.videos = []
         self.current = 0
         
@@ -96,9 +97,8 @@ class VideoUI():
         self.treeView.append_column(column)
         hbox.pack_start(vbox, True, True, 0)
         
-        self.treeView.get_selection().connect("changed", controller.on_changed)
         self.treeView.set_cursor(self.current)
-        
+        self.treeView.get_selection().connect("changed", self.controller.on_changed)
 
         # other Signals
         self.win.connect("delete-event", controller.main_quit)
